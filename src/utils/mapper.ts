@@ -10,40 +10,34 @@ export const convertToMocoContact = ({
   lastName: lastname,
   phoneNumbers
 }: Contact | ContactTemplate) => {
-  let contact = {
-    gender: "U",
-    firstname,
-    lastname
-  };
 
-  const work_phone = phoneNumbers.filter(
+  const workPhone = phoneNumbers.filter(
     phoneNumber => phoneNumber.label === PhoneNumberLabel.WORK
   );
-  const mobile_phone = phoneNumbers.filter(
+  const mobilePhone = phoneNumbers.filter(
     phoneNumber => phoneNumber.label === PhoneNumberLabel.MOBILE
   );
 
-  if (work_phone[0]) {
-    contact["work_phone"] = work_phone[0].phoneNumber;
-  }
-  if (mobile_phone[0]) {
-    contact["mobile_phone"] = mobile_phone[0].phoneNumber;
-  }
-
-  return contact;
+  return {
+    gender: "U",
+    firstname,
+    lastname,
+    work_phone: workPhone.length ? workPhone[0].phoneNumber : "",
+    mobile_phone: mobilePhone.length ? mobilePhone[0].phoneNumber : ""
+  };
 };
 
 export const convertToClinqContact = (contact: any) => {
   const phoneNumbers: PhoneNumber[] = [];
 
-  if (contact.work_phone) {
+  if (contact.work_phone && contact.work_phone !== "") {
     phoneNumbers.push({
       label: PhoneNumberLabel.WORK,
       phoneNumber: contact.work_phone
     });
   }
 
-  if (contact.mobile_phone) {
+  if (contact.mobile_phone && contact.mobile_phone !== "") {
     phoneNumbers.push({
       label: PhoneNumberLabel.MOBILE,
       phoneNumber: contact.mobile_phone
