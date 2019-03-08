@@ -39,9 +39,11 @@ export const createContact = async (
     const client = await createClient(apiKey, apiUrl);
     const mocoContact = await client.post("", convertToMocoContact(contact));
     const convertedContact: Contact = convertToClinqContact(mocoContact);
+    // tslint:disable-next-line:no-console
     console.log(`Created contact for ${anonKey}`);
     return convertedContact;
   } catch (error) {
+    // tslint:disable-next-line:no-console
     console.error(
       `Could not create contact for key "${anonKey}: ${error.message}"`
     );
@@ -62,6 +64,7 @@ export const updateContact = async (
     const mocoContact = response.data;
     return convertToClinqContact(mocoContact);
   } catch (error) {
+    // tslint:disable-next-line:no-console
     console.error(
       `Could not update contact for key "${anonKey}: ${error.message}"`
     );
@@ -85,8 +88,7 @@ const getContactsPage = async (
     mergedContacts.length < Number(response.headers["x-total"])
   );
 
-  console.log(response.headers);
-
+  // tslint:disable-next-line:no-console
   console.log(`Fetched ${mergedContacts.length} contacts for key ${anonKey}`);
 
   if (more) {
