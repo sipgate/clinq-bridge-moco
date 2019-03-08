@@ -8,7 +8,8 @@ import {
 export const convertToMocoContact = ({
   firstName: firstname,
   lastName: lastname,
-  phoneNumbers
+  phoneNumbers,
+  email
 }: Contact | ContactTemplate) => {
 
   const workPhone = phoneNumbers.filter(
@@ -20,8 +21,9 @@ export const convertToMocoContact = ({
 
   return {
     gender: "U",
-    firstname,
-    lastname,
+    firstname: firstname ? firstname : "",
+    lastname: lastname ? lastname : "",
+    work_email: email ? email : "",
     work_phone: workPhone.length ? workPhone[0].phoneNumber : "",
     mobile_phone: mobilePhone.length ? mobilePhone[0].phoneNumber : ""
   };
