@@ -1,22 +1,35 @@
 {
-  "name": "clinq-bride-mocoapp",
+  "name": "clinq-bridge-mocoapp",
   "version": "0.1.0",
   "private": true,
+  "description": "CLINQ CRM-Bridge for Moco app",
+  "main": "dist/index.js",
+  "repository": "git@github.com:sipgate/clinq-bridge-mocoapp.git",
+  "contributors": [
+    {
+      "name": "Pascal Jordin",
+      "email": "pascal@jordin.eu"
+    }
+  ],
+  "license": "Apache-2.0",
   "dependencies": {
+    "@clinq/bridge": "^7.7.1",
     "@types/jest": "24.0.9",
     "@types/node": "11.10.5",
     "@types/react": "16.8.7",
     "@types/react-dom": "16.8.2",
+    "axios": "^0.18.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-scripts": "2.1.8",
     "typescript": "3.3.3333"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "postinstall": "tsc",
+    "compile": "tsc",
+    "start": "ts-node src/index",
+    "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "lint": "tslint --project tsconfig.json"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -26,5 +39,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
 }
