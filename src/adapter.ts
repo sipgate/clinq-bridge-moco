@@ -14,12 +14,12 @@ import {
   convertToMocoContact
 } from "./utils";
 
-export const createClient = async (apiKey: string, apiDomain: string) => {
+export const createClient = async (apiKey: string, apiUrl: string) => {
   if (typeof apiKey !== "string") {
     throw new Error("Invalid API key.");
   }
   return axios.create({
-    baseURL: `https://${apiDomain}.mocoapp.com/api/v1/contacts/people`,
+    baseURL: `${apiUrl}/api/v1/contacts/people`,
     headers: { Authorization: `Token token=${apiKey}` }
   });
 };
