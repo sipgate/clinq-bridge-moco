@@ -26,7 +26,7 @@ export const createClient = async (apiKey: string, apiUrl: string) => {
 
 export const getContacts = async ({ apiKey, apiUrl }: Config) => {
   const client = await createClient(apiKey, apiUrl);
-  return getContactsPage(apiKey, client, 0, []);
+  return getContactsPage(apiKey, client, 1, []);
 };
 
 export const createContact = async (
@@ -80,7 +80,7 @@ const getContactsPage = async (
 ): Promise<Contact[]> => {
   const anonKey = anonymizeKey(apiKey);
 
-  const response = await client.get("");
+  const response = await client.get(`?page=${page}`);
 
   const contacts = response.data.map(convertToClinqContact);
   const mergedContacts = [...accumulated, ...contacts];
