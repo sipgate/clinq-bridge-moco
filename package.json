@@ -18,7 +18,7 @@
     "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {
-    "@clinq/bridge": "^9.0.2",
+    "@clinq/bridge": "^9.4.1",
     "@types/node": "^11.11.7",
     "axios": "^0.18.0",
     "typescript": "^3.3.4000"
