@@ -5,7 +5,10 @@ import {
   Contact,
   ContactTemplate,
   ContactUpdate,
-  ServerError
+  ServerError,
+  CallDirection,
+  CallEvent,
+  Channel
 } from "@clinq/bridge";
 
 import {
@@ -13,30 +16,41 @@ import {
   convertToClinqContact,
   convertToMocoContact
 } from "./utils";
+import { parsePhoneNumber, normalizePhoneNumber } from "./utils/phone-number";
+import { formatDuration } from "./utils/duration";
+import { IComment, ICommentTemplate, COMMENTABLE_TYPE } from "./models";
 
-export const createClient = async (apiKey: string, apiUrl: string) => {
+enum ENDPOINTS {
+  CONTACTS = "contacts/people",
+  COMMENTS = "comments"
+}
+
+export const createClient = async (
+  { apiKey, apiUrl }: Config,
+  endpoint: string = ENDPOINTS.CONTACTS
+) => {
   if (typeof apiKey !== "string") {
     throw new Error("Invalid API key.");
   }
   return axios.create({
-    baseURL: `${apiUrl}/api/v1/contacts/people`,
+    baseURL: `${apiUrl}/api/v1/${endpoint}`,
     headers: { Authorization: `Token token=${apiKey}` }
   });
 };
 
-export const getContacts = async ({ apiKey, apiUrl }: Config) => {
-  const client = await createClient(apiKey, apiUrl);
-  return getContactsPage(apiKey, client, 1, []);
+export const getContacts = async (config: Config): Promise<Contact[]> => {
+  const client = await createClient(config);
+  return getContactsPage(config.apiKey, client, 1, []);
 };
 
 export const createContact = async (
-  { apiKey, apiUrl }: Config,
+  config: Config,
   contact: ContactTemplate
 ): Promise<Contact> => {
-  const anonKey = anonymizeKey(apiKey);
+  const anonKey = anonymizeKey(config.apiKey);
 
   try {
-    const client = await createClient(apiKey, apiUrl);
+    const client = await createClient(config);
     const mocoContact = await client.post("", convertToMocoContact(contact));
     const convertedContact: Contact = convertToClinqContact(mocoContact);
     // tslint:disable-next-line:no-console
@@ -52,14 +66,14 @@ export const createContact = async (
 };
 
 export const updateContact = async (
-  { apiKey, apiUrl }: Config,
+  config: Config,
   id: string,
   contact: ContactUpdate
 ): Promise<Contact> => {
-  const anonKey = anonymizeKey(apiKey);
+  const anonKey = anonymizeKey(config.apiKey);
 
   try {
-    const client = await createClient(apiKey, apiUrl);
+    const client = await createClient(config);
     const response = await client.put(`/${id}`, convertToMocoContact(contact));
     const mocoContact = response.data;
     return convertToClinqContact(mocoContact);
@@ -70,6 +84,35 @@ export const updateContact = async (
     );
     throw new ServerError(400, "Could not update contact");
   }
+};
+
+const getContactByPhoneNumber = async (
+  config: Config,
+  phoneNumber: string
+): Promise<Contact> => {
+  const parsedPhoneNumber = parsePhoneNumber(phoneNumber);
+  const contacts = await getContacts(config);
+  const possiblePhoneNumberFormats = [
+    phoneNumber,
+    parsedPhoneNumber.localized,
+    normalizePhoneNumber(parsedPhoneNumber.localized),
+    parsedPhoneNumber.e164,
+    normalizePhoneNumber(parsedPhoneNumber.e164)
+  ];
+  const result = contacts.find(contact =>
+    contact.phoneNumbers.find(contactPhoneNumber =>
+      possiblePhoneNumberFormats.includes(
+        normalizePhoneNumber(contactPhoneNumber.phoneNumber)
+      )
+    )
+  );
+
+  if (!result) {
+    // tslint:disable-next-line:no-console
+    console.error(`Cannot find contact for phone number ${phoneNumber}`);
+  }
+
+  return result;
 };
 
 const getContactsPage = async (
@@ -96,4 +139,84 @@ const getContactsPage = async (
   } else {
     return mergedContacts;
   }
+};
+
+export const handleCallEvent = async (
+  config: Config,
+  callEvent: CallEvent
+): Promise<void> => {
+  const { direction, from, to, channel } = callEvent;
+  try {
+    const client = await createClient(config, ENDPOINTS.COMMENTS);
+    const phoneNumber = direction === CallDirection.IN ? from : to;
+    const contact: Contact = await getContactByPhoneNumber(config, phoneNumber);
+
+    if (!contact) {
+      // tslint:disable-next-line:no-console
+      console.error("Could not save CallEvent for", phoneNumber);
+      return;
+    }
+
+    const comment: ICommentTemplate = parseCallComment(
+      contact,
+      channel,
+      callEvent,
+      config.locale
+    );
+    await createCallComment(client, comment, config.apiKey);
+  } catch (error) {
+    throw new ServerError(400, "Could not save CallEvent");
+  }
+};
+
+export const createCallComment = async (
+  client: AxiosInstance,
+  comment: ICommentTemplate,
+  anonKey: string
+): Promise<IComment> => {
+  try {
+    const mocoComment: IComment = await client.post("", comment);
+    // tslint:disable-next-line:no-console
+    console.log(`Created call comment for ${anonKey}`);
+    return mocoComment;
+  } catch (error) {
+    // tslint:disable-next-line:no-console
+    console.error(
+      `Could not create call comment for key "${anonKey}: ${error.message}"`
+    );
+    throw new ServerError(400, "Could not create call comment");
+  }
+};
+
+const parseCallComment = (
+  contact: Contact,
+  channel: Channel,
+  { start, end, direction }: CallEvent,
+  locale: string
+): ICommentTemplate => {
+  const date = new Date(start);
+  const duration = formatDuration(end - start);
+  const isGerman = locale === "de_DE";
+
+  const directionInfo =
+    direction === CallDirection.IN
+      ? isGerman
+        ? "Eingehender"
+        : "Incoming"
+      : isGerman
+      ? "Ausgehender"
+      : "Outgoing";
+
+  const textEN = `<div><strong>${directionInfo}</strong> CLINQ call in <strong>"${
+    channel.name
+  }"</strong> on ${date.getFullYear()}-${date.getMonth()}-${date.getDate()} (${duration})<div>`;
+  const textDE = `<div><strong>${directionInfo}</strong> CLINQ Anruf in <strong>"${
+    channel.name
+  }"</strong> am ${date.getDate()}.${date.getMonth()}.${date.getFullYear()} (${duration})<div>`;
+
+  return {
+    commentable_id: contact.id,
+    commentable_type: COMMENTABLE_TYPE.CONTACT,
+    text: isGerman ? textDE : textEN
+  };
 };
