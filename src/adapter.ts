@@ -146,6 +146,8 @@ export const handleCallEvent = async (
   callEvent: CallEvent
 ): Promise<void> => {
   const { direction, from, to, channel } = callEvent;
+  const anonKey = anonymizeKey(config.apiKey);
+
   try {
     const client = await createClient(config, ENDPOINTS.COMMENTS);
     const phoneNumber = direction === CallDirection.IN ? from : to;
@@ -163,7 +165,7 @@ export const handleCallEvent = async (
       callEvent,
       config.locale
     );
-    await createCallComment(client, comment, config.apiKey);
+    await createCallComment(client, comment, anonKey);
   } catch (error) {
     throw new ServerError(400, "Could not save CallEvent");
   }
