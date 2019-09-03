@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import * as moment from "moment";
 
 import {
   Config,
@@ -196,7 +197,8 @@ const parseCallComment = (
   { start, end, direction }: CallEvent,
   locale: string
 ): ICommentTemplate => {
-  const date = new Date(start);
+  const date = moment(Number(start));
+
   const duration = formatDuration(end - start);
   const isGerman = locale === "de_DE";
 
@@ -211,10 +213,10 @@ const parseCallComment = (
 
   const textEN = `<div><strong>${directionInfo}</strong> CLINQ call in <strong>"${
     channel.name
-  }"</strong> on ${date.getFullYear()}-${date.getMonth()}-${date.getDate()} (${duration})<div>`;
+  }"</strong> on ${date.format("YYYY-MM-DD")} (${duration})<div>`;
   const textDE = `<div><strong>${directionInfo}</strong> CLINQ Anruf in <strong>"${
     channel.name
-  }"</strong> am ${date.getDate()}.${date.getMonth()}.${date.getFullYear()} (${duration})<div>`;
+  }"</strong> am ${date.format("DD.MM.YYYY")} (${duration})<div>`;
 
   return {
     commentable_id: contact.id,
