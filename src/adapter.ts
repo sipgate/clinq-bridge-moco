@@ -21,10 +21,16 @@ import { parsePhoneNumber, normalizePhoneNumber } from "./utils/phone-number";
 import { formatDuration } from "./utils/duration";
 import { IComment, ICommentTemplate, COMMENTABLE_TYPE } from "./models";
 
+const FETCH_DELAY = 500;
+
 enum ENDPOINTS {
   CONTACTS = "contacts/people",
   COMMENTS = "comments"
 }
+
+const delay = (time: number) => {
+  return new Promise(resolve => setTimeout(resolve, time));
+};
 
 export const createClient = async (
   { apiKey, apiUrl }: Config,
@@ -136,6 +142,7 @@ const getContactsPage = async (
   console.log(`Fetched ${mergedContacts.length} contacts for key ${anonKey}`);
 
   if (more) {
+    await delay(FETCH_DELAY);
     return getContactsPage(apiKey, client, ++page, mergedContacts);
   } else {
     return mergedContacts;
