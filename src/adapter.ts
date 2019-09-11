@@ -21,7 +21,7 @@ import { parsePhoneNumber, normalizePhoneNumber } from "./utils/phone-number";
 import { formatDuration } from "./utils/duration";
 import { IComment, ICommentTemplate, COMMENTABLE_TYPE } from "./models";
 
-const FETCH_DELAY = 500;
+const FETCH_DELAY = 1000;
 
 enum ENDPOINTS {
   CONTACTS = "contacts/people",
