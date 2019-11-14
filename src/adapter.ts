@@ -1,25 +1,24 @@
-import axios, { AxiosInstance } from "axios";
-import * as moment from "moment";
-
 import {
+  CallDirection,
+  CallEvent,
+  Channel,
   Config,
   Contact,
   ContactTemplate,
   ContactUpdate,
-  ServerError,
-  CallDirection,
-  CallEvent,
-  Channel
+  ServerError
 } from "@clinq/bridge";
-
+import axios, { AxiosInstance } from "axios";
+import * as moment from "moment";
+import { COMMENTABLE_TYPE, IComment, ICommentTemplate } from "./models";
+import { IMocoContact } from "./models/contact.model";
 import {
   anonymizeKey,
   convertToClinqContact,
   convertToMocoContact
 } from "./utils";
-import { parsePhoneNumber, normalizePhoneNumber } from "./utils/phone-number";
 import { formatDuration } from "./utils/duration";
-import { IComment, ICommentTemplate, COMMENTABLE_TYPE } from "./models";
+import { normalizePhoneNumber, parsePhoneNumber } from "./utils/phone-number";
 
 const FETCH_DELAY = 1000;
 
@@ -58,8 +57,14 @@ export const createContact = async (
 
   try {
     const client = await createClient(config);
-    const mocoContact = await client.post("", convertToMocoContact(contact));
-    const convertedContact: Contact = convertToClinqContact(mocoContact);
+    const { data: mocoContact } = await client.post<IMocoContact>(
+      "",
+      convertToMocoContact(contact)
+    );
+    const convertedContact: Contact = convertToClinqContact(
+      mocoContact,
+      config.apiUrl
+    );
     // tslint:disable-next-line:no-console
     console.log(`Created contact for ${anonKey}`);
     return convertedContact;
@@ -81,9 +86,11 @@ export const updateContact = async (
 
   try {
     const client = await createClient(config);
-    const response = await client.put(`/${id}`, convertToMocoContact(contact));
-    const mocoContact = response.data;
-    return convertToClinqContact(mocoContact);
+    const { data: mocoContact } = await client.put<IMocoContact>(
+      `/${id}`,
+      convertToMocoContact(contact)
+    );
+    return convertToClinqContact(mocoContact, config.apiUrl);
   } catch (error) {
     // tslint:disable-next-line:no-console
     console.error(

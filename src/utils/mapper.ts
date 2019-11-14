@@ -4,14 +4,18 @@ import {
   PhoneNumber,
   PhoneNumberLabel
 } from "@clinq/bridge";
+import {
+  IMocoContact,
+  IMocoContactTemplate,
+  MocoGender
+} from "../models/contact.model";
 
 export const convertToMocoContact = ({
   firstName: firstname,
   lastName: lastname,
   phoneNumbers,
   email
-}: Contact | ContactTemplate) => {
-
+}: Contact | ContactTemplate): IMocoContactTemplate => {
   const workPhone = phoneNumbers.filter(
     phoneNumber => phoneNumber.label === PhoneNumberLabel.WORK
   );
@@ -20,7 +24,7 @@ export const convertToMocoContact = ({
   );
 
   return {
-    gender: "U",
+    gender: MocoGender.UNKNOWN,
     firstname: firstname ? firstname : "",
     lastname: lastname ? lastname : "",
     work_email: email ? email : "",
@@ -29,7 +33,10 @@ export const convertToMocoContact = ({
   };
 };
 
-export const convertToClinqContact = (contact: any) => {
+export const convertToClinqContact = (
+  contact: IMocoContact,
+  apiUrl: string
+): Contact => {
   const phoneNumbers: PhoneNumber[] = [];
 
   if (contact.work_phone && contact.work_phone !== "") {
@@ -46,10 +53,12 @@ export const convertToClinqContact = (contact: any) => {
     });
   }
 
+  const contactId = String(contact.id);
+
   return {
-    id: String(contact.id),
-    avatarUrl: contact.avatar_url,
-    contactUrl: null,
+    id: contactId,
+    avatarUrl: contact.avatar_url ? contact.avatar_url : null,
+    contactUrl: `${apiUrl}/contacts/people/${contactId}`,
     name: null,
     firstName: contact.firstname ? contact.firstname : null,
     lastName: contact.lastname ? contact.lastname : null,
