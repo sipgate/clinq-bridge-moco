@@ -15,7 +15,8 @@ import { IMocoContact } from "./models/contact.model";
 import {
   anonymizeKey,
   convertToClinqContact,
-  convertToMocoContact
+  convertToMocoContact,
+  urlNormalize
 } from "./utils";
 import { formatDuration } from "./utils/duration";
 import { normalizePhoneNumber, parsePhoneNumber } from "./utils/phone-number";
@@ -39,7 +40,7 @@ export const createClient = async (
     throw new Error("Invalid API key.");
   }
   return axios.create({
-    baseURL: `${apiUrl}/api/v1/${endpoint}`,
+    baseURL: `${urlNormalize(apiUrl)}/api/v1/${endpoint}`,
     headers: { Authorization: `Token token=${apiKey}` }
   });
 };
@@ -63,7 +64,7 @@ export const createContact = async (
     );
     const convertedContact: Contact = convertToClinqContact(
       mocoContact,
-      config.apiUrl
+      urlNormalize(config.apiUrl)
     );
     // tslint:disable-next-line:no-console
     console.log(`Created contact for ${anonKey}`);
@@ -90,7 +91,7 @@ export const updateContact = async (
       `/${id}`,
       convertToMocoContact(contact)
     );
-    return convertToClinqContact(mocoContact, config.apiUrl);
+    return convertToClinqContact(mocoContact, urlNormalize(config.apiUrl));
   } catch (error) {
     // tslint:disable-next-line:no-console
     console.error(
