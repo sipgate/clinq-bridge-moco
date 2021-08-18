@@ -1,9 +1,0 @@
-service: clinq-bridge-moco
-runtime: custom
-env: flex
-
-liveness_check:
-  path: "/health"
-
-readiness_check:
-  path: "/health"
