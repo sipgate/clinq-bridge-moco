@@ -119,3 +119,6 @@ tags
 #!! ERROR: visual-studio-code is undefined. Use list command to see defined gitignore types !!#
 
 # End of https://www.gitignore.io/api/node,visual-studio-code,vim
+
+# Kubernetes
+k8s/prod.yml
