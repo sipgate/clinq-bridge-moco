@@ -1,18 +1,17 @@
-FROM node:lts-alpine AS builder
-RUN apk add --no-cache yarn
+FROM node:16-alpine AS builder
 WORKDIR /usr/src/app
-COPY package*.json yarn.lock ./
-RUN yarn
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN yarn build
+RUN npm run test
+RUN npm run build
 
-FROM node:lts-alpine
-RUN apk add --no-cache yarn
+FROM node:16-alpine
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
-COPY package*.json yarn.lock ./
-RUN yarn --production
+COPY package*.json ./
+RUN npm ci
 COPY --from=builder /usr/src/app/dist/ dist/
 USER node
 EXPOSE 8080
-ENTRYPOINT node dist/index.js
+ENTRYPOINT ["node", "dist/index.js"]
