@@ -1,7 +1,7 @@
 {
   "name": "clinq-bridge-moco",
-  "version": "1.0.0",
-  "description": "CLINQ bridge for moco crm",
+  "private": true,
+  "description": "CLINQ bridge for Moco CRM",
   "main": "dist/index.js",
   "repository": "git@github.com:sipgate/clinq-bridge-moco.git",
   "contributors": [
@@ -12,29 +12,26 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "start": "ts-node src/index",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
     "build": "tsc",
-    "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    "start": "ts-node src/index.ts",
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "@clinq/bridge": "^11.2.4",
+    "@clinq/bridge": "^11.3.1",
     "@types/node": "^16.6.1",
     "axios": "^0.21.1",
-    "moment": "^2.29.1",
-    "typescript": "^4.3.5"
+    "husky": "^7.0.1",
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@types/google-libphonenumber": "^7.4.21",
-    "husky": "^7.0.1",
     "lint-staged": "^11.1.2",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
-    "ts-node": "^10.2.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
   },
   "lint-staged": {
     "*.{ts}": [
@@ -44,9 +41,6 @@
     "*.{json,yml,md}": [
       "prettier --write",
       "git add"
-    ],
-    "Dockerfile": [
-      "dockerfilelint"
     ]
   }
 }

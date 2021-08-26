@@ -3,14 +3,14 @@ import {
   createContact,
   getContacts,
   updateContact,
-  handleCallEvent
+  handleCallEvent,
 } from "./adapter";
 
 const adapter: Adapter = {
   createContact,
   getContacts,
   updateContact,
-  handleCallEvent
+  handleCallEvent,
 };
 
 start(adapter);

@@ -6,7 +6,7 @@ import {
   Contact,
   ContactTemplate,
   ContactUpdate,
-  ServerError
+  ServerError,
 } from "@clinq/bridge";
 import axios, { AxiosInstance } from "axios";
 import * as moment from "moment";
@@ -16,7 +16,7 @@ import {
   anonymizeKey,
   convertToClinqContact,
   convertToMocoContact,
-  urlNormalize
+  urlNormalize,
 } from "./utils";
 import { formatDuration } from "./utils/duration";
 import { normalizePhoneNumber, parsePhoneNumber } from "./utils/phone-number";
@@ -25,11 +25,11 @@ const FETCH_DELAY = 1000;
 
 enum ENDPOINTS {
   CONTACTS = "contacts/people",
-  COMMENTS = "comments"
+  COMMENTS = "comments",
 }
 
 const delay = (time: number) => {
-  return new Promise(resolve => setTimeout(resolve, time));
+  return new Promise((resolve) => setTimeout(resolve, time));
 };
 
 export const createClient = async (
@@ -41,7 +41,7 @@ export const createClient = async (
   }
   return axios.create({
     baseURL: `${urlNormalize(apiUrl)}/api/v1/${endpoint}`,
-    headers: { Authorization: `Token token=${apiKey}` }
+    headers: { Authorization: `Token token=${apiKey}` },
   });
 };
 
@@ -112,10 +112,10 @@ const getContactByPhoneNumber = async (
     parsedPhoneNumber.localized,
     normalizePhoneNumber(parsedPhoneNumber.localized),
     parsedPhoneNumber.e164,
-    normalizePhoneNumber(parsedPhoneNumber.e164)
+    normalizePhoneNumber(parsedPhoneNumber.e164),
   ];
-  const result = contacts.find(contact =>
-    contact.phoneNumbers.find(contactPhoneNumber =>
+  const result = contacts.find((contact) =>
+    contact.phoneNumbers.find((contactPhoneNumber) =>
       possiblePhoneNumberFormats.includes(
         normalizePhoneNumber(contactPhoneNumber.phoneNumber)
       )
@@ -236,6 +236,6 @@ const parseCallComment = (
   return {
     commentable_id: contact.id,
     commentable_type: COMMENTABLE_TYPE.CONTACT,
-    text: isGerman ? textDE : textEN
+    text: isGerman ? textDE : textEN,
   };
 };

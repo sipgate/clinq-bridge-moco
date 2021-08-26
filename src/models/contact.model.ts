@@ -3,7 +3,7 @@ import { IMocoCompany } from "./company.model";
 export enum MocoGender {
   FEMALE = "F",
   MALE = "M",
-  UNKNOWN = "U"
+  UNKNOWN = "U",
 }
 
 export interface IMocoContactTemplate {

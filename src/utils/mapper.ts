@@ -2,25 +2,25 @@ import {
   Contact,
   ContactTemplate,
   PhoneNumber,
-  PhoneNumberLabel
+  PhoneNumberLabel,
 } from "@clinq/bridge";
 import {
   IMocoContact,
   IMocoContactTemplate,
-  MocoGender
+  MocoGender,
 } from "../models/contact.model";
 
 export const convertToMocoContact = ({
   firstName: firstname,
   lastName: lastname,
   phoneNumbers,
-  email
+  email,
 }: Contact | ContactTemplate): IMocoContactTemplate => {
   const workPhone = phoneNumbers.filter(
-    phoneNumber => phoneNumber.label === PhoneNumberLabel.WORK
+    (phoneNumber) => phoneNumber.label === PhoneNumberLabel.WORK
   );
   const mobilePhone = phoneNumbers.filter(
-    phoneNumber => phoneNumber.label === PhoneNumberLabel.MOBILE
+    (phoneNumber) => phoneNumber.label === PhoneNumberLabel.MOBILE
   );
 
   return {
@@ -29,7 +29,7 @@ export const convertToMocoContact = ({
     lastname: lastname ? lastname : "",
     work_email: email ? email : "",
     work_phone: workPhone.length ? workPhone[0].phoneNumber : "",
-    mobile_phone: mobilePhone.length ? mobilePhone[0].phoneNumber : ""
+    mobile_phone: mobilePhone.length ? mobilePhone[0].phoneNumber : "",
   };
 };
 
@@ -42,14 +42,14 @@ export const convertToClinqContact = (
   if (contact.work_phone && contact.work_phone !== "") {
     phoneNumbers.push({
       label: PhoneNumberLabel.WORK,
-      phoneNumber: contact.work_phone
+      phoneNumber: contact.work_phone,
     });
   }
 
   if (contact.mobile_phone && contact.mobile_phone !== "") {
     phoneNumbers.push({
       label: PhoneNumberLabel.MOBILE,
-      phoneNumber: contact.mobile_phone
+      phoneNumber: contact.mobile_phone,
     });
   }
 
@@ -65,6 +65,6 @@ export const convertToClinqContact = (
     email: contact.work_email ? contact.work_email : null,
     organization:
       contact.company && contact.company.name ? contact.company.name : null,
-    phoneNumbers
+    phoneNumbers,
   };
 };

@@ -1,7 +1,7 @@
 export enum CompanyType {
   CUSTOMER = "customer",
   SUPPLIER = "supplier",
-  ORGANIZATION = "organization"
+  ORGANIZATION = "organization",
 }
 export interface IMocoCompany {
   id: number;

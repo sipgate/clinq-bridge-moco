@@ -20,7 +20,7 @@ export enum COMMENTABLE_TYPE {
   CUSTOMER = "Customer",
   PROJECT = "Project",
   INVOICE = "Invoice",
-  CONTACT = "Contact"
+  CONTACT = "Contact",
 }
 
 export interface ICommentUser {
