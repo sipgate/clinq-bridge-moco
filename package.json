@@ -24,7 +24,7 @@
     "@types/node": "^16.6.1",
     "axios": "^0.21.1",
     "husky": "^7.0.1",
-    "moment": "^2.29.1"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
     "@types/google-libphonenumber": "^7.4.21",
