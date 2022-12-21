@@ -10,12 +10,15 @@ import {
   MocoGender,
 } from "../models/contact.model";
 
-export const convertToMocoContact = ({
-  firstName: firstname,
-  lastName: lastname,
-  phoneNumbers,
-  email,
-}: Contact | ContactTemplate): IMocoContactTemplate => {
+export const convertToMocoContact = (
+  {
+    firstName: firstname,
+    lastName: lastname,
+    phoneNumbers,
+    email,
+  }: Contact | ContactTemplate,
+  ignoreUnknown = false
+): IMocoContactTemplate => {
   const workPhone = phoneNumbers.filter(
     (phoneNumber) => phoneNumber.label === PhoneNumberLabel.WORK
   );
@@ -24,7 +27,7 @@ export const convertToMocoContact = ({
   );
 
   return {
-    gender: MocoGender.UNKNOWN,
+    gender: ignoreUnknown ? undefined : MocoGender.UNKNOWN,
     firstname: firstname ? firstname : "",
     lastname: lastname ? lastname : "",
     work_email: email ? email : "",

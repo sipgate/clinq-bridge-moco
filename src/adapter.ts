@@ -89,7 +89,7 @@ export const updateContact = async (
     const client = await createClient(config);
     const { data: mocoContact } = await client.put<IMocoContact>(
       `/${id}`,
-      convertToMocoContact(contact)
+      convertToMocoContact(contact, true)
     );
     return convertToClinqContact(mocoContact, urlNormalize(config.apiUrl));
   } catch (error) {
